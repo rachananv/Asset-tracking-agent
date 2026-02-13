@@ -1,4 +1,5 @@
 import { ApiService } from './api.js';
+console.log('Chatbot App Module Loading...');
 
 // State Management
 let currentTab = 'dashboard';
@@ -215,8 +216,19 @@ document.getElementById('page-chat').addEventListener('click', () => {
     userInput.focus();
 });
 
-console.log('App initialized and ready');
+const initApp = () => {
+    console.log('App Initializing...');
+    loadAssets();
+    if (window.lucide) {
+        lucide.createIcons();
+    } else {
+        console.warn('Lucide not found at init');
+    }
+    console.log('App initialization complete');
+};
 
-// Initial Load
-loadAssets();
-lucide.createIcons();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}

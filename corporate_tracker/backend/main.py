@@ -51,11 +51,34 @@ def update_status(status_update: StatusUpdate):
         raise HTTPException(status_code=404, detail="Asset not found")
     return updated
 
+import mimetypes
+mimetypes.add_type('application/javascript', '.js')
+mimetypes.add_type('text/css', '.css')
+
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi import Request
+import time
 
-# Get frontend directory (now at project root for GitHub Pages)
-FRONTEND_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Robust path resolution
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+FRONTEND_DIR = BASE_DIR
+
+print(f"DEBUG: BASE_DIR resolved to: {BASE_DIR}")
+print(f"DEBUG: Checking index.html at: {os.path.join(FRONTEND_DIR, 'index.html')}")
+if os.path.exists(os.path.join(FRONTEND_DIR, 'index.html')):
+    print("DEBUG: index.html found!")
+else:
+    print("DEBUG: index.html NOT FOUND!")
+
+# Request logging middleware
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    print(f"DEBUG: {request.method} {request.url.path} - Status: {response.status_code} - Done in {duration:.4f}s")
+    return response
 
 # Include routers
 from agent import agent
@@ -67,11 +90,18 @@ def chat(request: ChatRequest):
         result = agent.process_message(request.session_id, request.message)
         return result
     except Exception as e:
+        print(f"CHAT ERROR: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Serve frontend assets (styles, js, etc)
-app.mount("/styles", StaticFiles(directory=os.path.join(FRONTEND_DIR, "styles")), name="styles")
-app.mount("/js", StaticFiles(directory=os.path.join(FRONTEND_DIR, "js")), name="js")
+# Check directories exist before mounting
+for folder in ["styles", "js"]:
+    path = os.path.join(FRONTEND_DIR, folder)
+    if os.path.exists(path):
+        print(f"DEBUG: Mounting {folder} from {path}")
+        app.mount(f"/{folder}", StaticFiles(directory=path), name=folder)
+    else:
+        print(f"DEBUG: FOLDER NOT FOUND: {path}")
 
 @app.get("/")
 def read_root():
@@ -79,4 +109,8 @@ def read_root():
 
 if __name__ == "__main__":
     import uvicorn
+    print("\n" + "="*50)
+    print("ASSET TRACKER SERVER STARTING")
+    print("Link: http://localhost:8000")
+    print("="*50 + "\n")
     uvicorn.run(app, host="0.0.0.0", port=8000)
