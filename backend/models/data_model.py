@@ -1,5 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
+import uuid
+
 
 class Asset(BaseModel):
     
@@ -11,3 +13,5 @@ class Asset(BaseModel):
     purchase_date: str 
     status: str 
     last_updated_at: str
+
+

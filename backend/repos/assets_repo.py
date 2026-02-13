@@ -37,3 +37,5 @@ class AssetRepo:
     
     def delete(asset_id: str):
         memory_db.execute("DELETE FROM assets WHERE asset_id = ?", (asset_id,))
+
+

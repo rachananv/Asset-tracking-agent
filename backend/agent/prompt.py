@@ -9,4 +9,10 @@ ROOT_AGENT_PROMPT = """
         5. **Call the tools.** Once the parameters are validated, call the tool with the determined parameters.
         6. **Analyze the tool's results, and provide insights back to the user.** Striclty Return the tool's result in a human-readable format.
         7. **Ask the user if they need anything else.**
+
+    
+...
+
     """
+
+

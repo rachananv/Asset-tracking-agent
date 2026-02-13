@@ -1,0 +1,24 @@
+# Environments
+.env
+backend/.env
+corporate_tracker/backend/.env
+venv/
+backend/venv/
+corporate_tracker/backend/venv/
+.venv/
+env/
+python_files/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Logs
+*.log
+backend/install_log.txt
+
+# System
+.DS_Store
+Thumbs.db
