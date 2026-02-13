@@ -77,33 +77,51 @@ export const ApiService = {
                 throw new Error('MISSING_API_KEY');
             }
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `You are the Corporate Assets Tracker Assistant. 
+            const fetchWithRetry = async (retries = 3, delay = 1000) => {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{
+                                    text: `You are the Corporate Assets Tracker Assistant. 
                     Your goal is to help users manage corporate assets.
                     Current assets: ${JSON.stringify(LocalStorageService.getAssets())}
                     
                     User message: ${message}
                     
-                    IMPORTANT: If the user wants to add/delete/update an asset, describe the action clearly. 
-                    The tool system is simulated here. Just respond as a helpful assistant.` }]
-                    }]
-                })
-            });
+                    IMPORTANT: Respond as a helpful assistant.`
+                                }]
+                            }]
+                        })
+                    });
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error?.message || 'AI Connection Failed');
-            }
+                    if (response.status === 503 && retries > 0) {
+                        console.warn(`Gemini busy, retrying in ${delay}ms...`);
+                        await new Promise(res => setTimeout(res, delay));
+                        return fetchWithRetry(retries - 1, delay * 2);
+                    }
 
-            const data = await response.json();
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error?.message || 'AI Connection Failed');
+                    }
+
+                    return response.json();
+                } catch (err) {
+                    if (retries > 0) {
+                        await new Promise(res => setTimeout(res, delay));
+                        return fetchWithRetry(retries - 1, delay * 2);
+                    }
+                    throw err;
+                }
+            };
+
+            const data = await fetchWithRetry();
             return {
                 response: data.candidates[0].content.parts[0].text,
-                tools_called: [] // Simplified for static preview
+                tools_called: []
             };
         }
 
