@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Assets Tracker</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <header class="navbar">
+        <h1>Corporate Assets Tracker</h1>
+        <nav class="nav-links">
+            <a id="nav-dashboard" class="active">Dashboard</a>
+            <a id="nav-chat">Chat</a>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <!-- Dashboard Page -->
+        <section id="page-dashboard" class="page">
+            <div class="header-row">
+                <h2>All Corporate Assets</h2>
+                <button class="btn-add" id="open-add-modal">+ Add Asset</button>
+            </div>
+            <div class="asset-grid" id="asset-list">
+                <!-- Assets will be injected here -->
+            </div>
+        </section>
+
+        <!-- Chat Page -->
+        <section id="page-chat" class="page hidden">
+            <div class="chat-container">
+                <aside class="chat-sidebar">
+                    <div class="sidebar-header">
+                        <button class="btn-add" style="width: 100%" id="new-session">+ New Session</button>
+                    </div>
+                    <div class="session-list" id="session-items">
+                        <!-- Sessions will be injected here -->
+                    </div>
+                </aside>
+                <main class="chat-main">
+                    <div class="chat-messages" id="chat-box">
+                        <div class="message message-ai">
+                            Hello! I'm your Corporate Asset Assistant. How can I help you today?
+                        </div>
+                    </div>
+                    <form class="chat-input-area" id="chat-form">
+                        <input type="text" class="chat-input" id="user-input" placeholder="Type a message..."
+                            autocomplete="off">
+                        <button type="submit" class="btn-send">
+                            <i data-lucide="send"></i>
+                        </button>
+                    </form>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <!-- Add/Edit Asset Modal -->
+    <div class="modal" id="asset-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Add New Asset</h3>
+            <form id="asset-form">
+                <input type="hidden" id="asset-id-field">
+                <div class="form-group">
+                    <label>Asset Type</label>
+                    <input type="text" id="asset-type" placeholder="e.g. Laptop" required>
+                </div>
+                <div class="form-group">
+                    <label>Brand</label>
+                    <input type="text" id="asset-brand" placeholder="e.g. Dell" required>
+                </div>
+                <div class="form-group">
+                    <label>Model</label>
+                    <input type="text" id="asset-model" placeholder="e.g. Latitude 7420" required>
+                </div>
+                <div class="form-group">
+                    <label>Purchase Date</label>
+                    <input type="date" id="asset-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="asset-status">
+                        <option value="Available">Available</option>
+                        <option value="Active">Active</option>
+                        <option value="Assigned">Assigned</option>
+                        <option value="Damaged">Damaged</option>
+                    </select>
+                </div>
+                <div class="card-actions" style="margin-top: 1.5rem">
+                    <button type="button" class="btn-add" style="background: #ccc" id="close-modal">Cancel</button>
+                    <button type="submit" class="btn-add">Save Asset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+    <script>
+        // Initialize icons
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

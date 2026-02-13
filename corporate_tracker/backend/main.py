@@ -54,8 +54,8 @@ def update_status(status_update: StatusUpdate):
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-# Get frontend directory
-FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+# Get frontend directory (now at project root for GitHub Pages)
+FRONTEND_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Include routers
 from agent import agent
