@@ -28,10 +28,16 @@ const geminiApiKeyInput = document.getElementById('gemini-api-key');
 const IS_GITHUB_PAGES = window.location.hostname.includes('github.io');
 
 if (IS_GITHUB_PAGES) {
-    if (connectionStatus) {
-        connectionStatus.textContent = 'Static Preview';
-        connectionStatus.style.background = '#f59e0b'; // Amber
-    }
+    const checkStatus = () => {
+        const hasKey = localStorage.getItem('gemini_api_key');
+        if (connectionStatus) {
+            connectionStatus.textContent = hasKey ? 'AI Active' : 'Static Preview';
+            connectionStatus.style.background = hasKey ? '#3b82f6' : '#f59e0b'; // Blue if active, Amber if not
+        }
+    };
+    checkStatus();
+    // Re-check after settings save
+    settingsForm.addEventListener('submit', () => setTimeout(checkStatus, 100));
 }
 
 // --- Navigation ---
