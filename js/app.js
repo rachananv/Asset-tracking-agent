@@ -21,6 +21,9 @@ const assetModal = document.getElementById('asset-modal');
 const assetForm = document.getElementById('asset-form');
 const sessionItems = document.getElementById('session-items');
 const connectionStatus = document.getElementById('connection-status');
+const settingsModal = document.getElementById('settings-modal');
+const settingsForm = document.getElementById('settings-form');
+const geminiApiKeyInput = document.getElementById('gemini-api-key');
 
 const IS_GITHUB_PAGES = window.location.hostname.includes('github.io');
 
@@ -132,6 +135,28 @@ document.getElementById('close-modal').onclick = () => {
     assetModal.style.display = 'none';
 };
 
+// --- Settings Logic ---
+document.getElementById('open-settings').onclick = () => {
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) geminiApiKeyInput.value = savedKey;
+    settingsModal.style.display = 'flex';
+};
+
+document.getElementById('close-settings').onclick = () => {
+    settingsModal.style.display = 'none';
+};
+
+settingsForm.onsubmit = (e) => {
+    e.preventDefault();
+    const key = geminiApiKeyInput.value.trim();
+    if (key) {
+        localStorage.setItem('gemini_api_key', key);
+        settingsModal.style.display = 'none';
+        alert('API Key saved! AI features are now active.');
+        loadAssets(); // Refresh demo data or indicators
+    }
+};
+
 assetForm.onsubmit = async (e) => {
     e.preventDefault();
     const id = document.getElementById('asset-id-field').value;
@@ -208,8 +233,12 @@ const handleSend = async () => {
 
     try {
         if (IS_GITHUB_PAGES) {
-            addMessage('ai', 'This is a **Static Preview** on GitHub Pages. The AI Chat requires a local server. Please use: http://localhost:8000');
-            return;
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) {
+                addMessage('ai', 'Welcome to the **Static Preview**! To use the AI Chat, please click the settings icon (⚙️) above and enter your Gemini API Key. Your key is saved locally in your browser.');
+                document.getElementById('open-settings').click();
+                return;
+            }
         }
         const result = await ApiService.sendChatMessage(activeSession, message);
         addMessage('ai', result.response, result.tools_called);
