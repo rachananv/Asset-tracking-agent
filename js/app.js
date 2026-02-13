@@ -20,6 +20,16 @@ const pageChat = document.getElementById('page-chat');
 const assetModal = document.getElementById('asset-modal');
 const assetForm = document.getElementById('asset-form');
 const sessionItems = document.getElementById('session-items');
+const connectionStatus = document.getElementById('connection-status');
+
+const IS_GITHUB_PAGES = window.location.hostname.includes('github.io');
+
+if (IS_GITHUB_PAGES) {
+    if (connectionStatus) {
+        connectionStatus.textContent = 'Static Preview';
+        connectionStatus.style.background = '#f59e0b'; // Amber
+    }
+}
 
 // --- Navigation ---
 const switchTab = (tab) => {
@@ -47,6 +57,14 @@ navChat.addEventListener('click', () => switchTab('chat'));
 // --- Dashboard Logic ---
 const loadAssets = async () => {
     try {
+        if (IS_GITHUB_PAGES) {
+            assets = [
+                { id: 'DEMO-1', type: 'Laptop', brand: 'Demo', model: 'MacBook Pro', status: 'Available', purchase_date: '2024-01-01' },
+                { id: 'DEMO-2', type: 'Phone', brand: 'Demo', model: 'Pixel 8', status: 'Assigned', purchase_date: '2024-01-02' }
+            ];
+            renderAssets();
+            return;
+        }
         assets = await ApiService.getAssets();
         renderAssets();
     } catch (error) {
@@ -189,6 +207,10 @@ const handleSend = async () => {
     userInput.value = '';
 
     try {
+        if (IS_GITHUB_PAGES) {
+            addMessage('ai', 'This is a **Static Preview** on GitHub Pages. The AI Chat requires a local server. Please use: http://localhost:8000');
+            return;
+        }
         const result = await ApiService.sendChatMessage(activeSession, message);
         addMessage('ai', result.response, result.tools_called);
 
